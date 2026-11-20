@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Мой магазин — касса в телефоне</title>
+<meta name="description" content="Касса, приход, склад и долги покупателей для магазина в Кыргызстане. Работает без интернета, на русском и кыргызском.">
+<meta name="theme-color" content="#167C5A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Golos+Text:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1F5F2;
+  --grid:#DCE8E2;
+  --ink:#13241D;
+  --muted:#53665D;
+  --line:#C5D6CD;
+  --green:#167C5A;
+  --green-deep:#0D4F39;
+  --pen:#2546C8;
+  --margin-red:#D9534F;
+  --white:#FFFFFF;
+  --cell:24px;
+  --display:"Unbounded", "Golos Text", system-ui, sans-serif;
+  --body:"Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --hand:"Caveat", "Segoe Print", cursive;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+body{
+  margin:0;
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:var(--cell) var(--cell);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:1.0625rem;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+@media (max-width:600px){.wrap{padding:0 16px}}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 0;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-family:var(--display);font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:var(--green);display:grid;place-items:center}
+.brand-mark svg{width:22px;height:22px}
+.top nav{display:flex;gap:28px;align-items:center}
+.top nav a{text-decoration:none;color:var(--muted);font-weight:500}
+.top nav a:hover{color:var(--ink)}
+.top nav a.btn-green,.top nav a.btn-green:hover{color:var(--white)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font:600 1rem/1 var(--body);padding:15px 22px;border-radius:12px;border:0;cursor:pointer;text-decoration:none;transition:transform .12s ease, background-color .15s ease}
+.btn:active{transform:translateY(1px)}
+.btn-green{background:var(--green);color:var(--white)}
+.btn-green:hover{background:var(--green-deep)}
+.btn-ghost{background:var(--white);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn-ghost:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.top .btn{padding:11px 16px;font-size:.95rem}
+@media (max-width:820px){.top nav a{display:none}}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:56px;align-items:center;padding:48px 0 96px}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(2.1rem,4.6vw,3.9rem);line-height:1.08;letter-spacing:-.03em;margin:0 0 24px;max-width:13ch}
+.hero .lead{font-size:1.2rem;color:var(--muted);max-width:34em;margin:0 0 32px}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.hero .note{font-size:.95rem;color:var(--muted);margin:0}
+.hand-hint{font-family:var(--hand);font-size:1.6rem;color:var(--pen);line-height:1.1;display:flex;align-items:flex-end;gap:8px;margin:40px 0 0 auto;max-width:280px;transform:rotate(-3deg)}
+.hand-hint svg{flex:none;width:70px;height:46px}
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr;gap:40px;padding:24px 0 72px}
+  .hand-hint{display:none}
+}
+
+/* ---------- phone demo ---------- */
+.phone{width:min(360px,100%);margin:0 auto;background:var(--ink);border-radius:44px;padding:12px;box-shadow:0 30px 60px -30px rgba(13,79,57,.55), 0 2px 0 rgba(255,255,255,.08) inset;position:relative}
+.screen{background:#F6F8F7;border-radius:34px;overflow:hidden;height:640px;display:flex;flex-direction:column;position:relative}
+.status{display:flex;justify-content:space-between;padding:12px 24px 6px;font-size:.78rem;font-weight:600;color:var(--ink)}
+.status .off{display:flex;align-items:center;gap:5px;color:var(--muted)}
+.appbar{display:flex;align-items:center;justify-content:space-between;padding:6px 16px 10px}
+.appbar strong{font-size:1.15rem}
+.shift{font-size:.75rem;background:#DDEFE6;color:var(--green-deep);padding:5px 9px;border-radius:999px;font-weight:600}
+.scan{margin:0 16px 10px;height:92px;border-radius:16px;background:#1C2B25;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#A9C2B6;font-size:.82rem;border:0;cursor:pointer;width:calc(100% - 32px);font-family:inherit}
+.scan .bars{display:flex;gap:3px;height:42px;align-items:stretch;opacity:.85}
+.scan .bars i{display:block;background:#E8F2ED;border-radius:1px}
+.scan .label{position:absolute;bottom:8px;left:0;right:0;text-align:center}
+.scan .beam{position:absolute;left:10%;right:10%;height:2px;background:#4BE3A3;box-shadow:0 0 12px 2px rgba(75,227,163,.7);top:50%;opacity:0}
+.scan.go .beam{animation:beam .55s ease-in-out}
+@keyframes beam{0%{opacity:1;top:18%}50%{top:78%}100%{opacity:0;top:18%}}
+.grid-products{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 10px}
+.prod{background:var(--white);border:0;border-radius:14px;padding:10px 8px;text-align:left;font-family:inherit;cursor:pointer;box-shadow:inset 0 0 0 1px #E1EAE5;min-height:64px;display:flex;flex-direction:column;justify-content:space-between}
+.prod:hover{box-shadow:inset 0 0 0 1.5px var(--green)}
+.prod span{font-size:.8rem;line-height:1.2;color:var(--ink)}
+.prod b{font-size:.85rem;color:var(--green-deep)}
+.cart{flex:1;overflow:auto;padding:4px 16px;border-top:1px solid #E1EAE5;margin-top:2px}
+.cart-empty{color:var(--muted);font-size:.85rem;text-align:center;padding:18px 8px}
+.line{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #EDF2EF;font-size:.88rem}
+.line .n{flex:1;min-width:0}
+.line .q{color:var(--muted);font-variant-numeric:tabular-nums}
+.line .s{font-weight:600;font-variant-numeric:tabular-nums;min-width:62px;text-align:right}
+.line button{border:0;background:#EEF3F0;width:26px;height:26px;border-radius:8px;cursor:pointer;font-size:1rem;line-height:1;color:var(--ink)}
+.pay{padding:12px 16px 16px;background:var(--white);border-top:1px solid #E1EAE5}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.total span{color:var(--muted);font-size:.85rem}
+.total b{font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pm{border:0;border-radius:12px;padding:12px 4px;font:600 .85rem/1 var(--body);cursor:pointer;background:#EAF3EE;color:var(--green-deep)}
+.pm.main{background:var(--green);color:var(--white)}
+.pm:disabled{opacity:.4;cursor:not-allowed}
+/* overlay inside the phone */
+.sheet{position:absolute;inset:auto 0 0 0;background:var(--white);border-radius:24px 24px 0 0;padding:20px 20px 24px;box-shadow:0 -20px 40px rgba(19,36,29,.18);transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.sheet.open{transform:none}
+.sheet h3{margin:0 0 4px;font-size:1.1rem}
+.sheet p{margin:0 0 14px;color:var(--muted);font-size:.9rem}
+.sheet .big{font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums;margin:2px 0 12px;letter-spacing:-.02em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.chip{border:0;border-radius:999px;padding:10px 14px;font:500 .9rem/1 var(--body);background:#EEF3F0;cursor:pointer;color:var(--ink)}
+.chip:hover{background:#DDEFE6}
+.cash-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #EDF2EF;font-size:.95rem}
+.cash-row b{font-variant-numeric:tabular-nums}
+.qr{width:150px;height:150px;margin:4px auto 14px;display:block}
+.sheet .btn{width:100%;margin-top:6px}
+.done{position:absolute;inset:0;background:var(--green);color:var(--white);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.done.open{opacity:1;pointer-events:auto}
+.done svg{width:64px;height:64px;margin-bottom:14px}
+.done h3{font-size:1.4rem;margin:0 0 6px}
+.done p{margin:0 0 22px;opacity:.85}
+.done .btn{background:var(--white);color:var(--green-deep)}
+.demo-cap{text-align:center;color:var(--muted);font-size:.9rem;margin:16px auto 0;max-width:340px}
+
+/* ---------- section basics ---------- */
+section{padding:96px 0}
+h2{font-family:var(--display);font-weight:700;font-size:clamp(1.7rem,3.4vw,2.7rem);line-height:1.12;letter-spacing:-.025em;margin:0 0 20px;max-width:18ch}
+.sub{color:var(--muted);font-size:1.15rem;max-width:36em;margin:0}
+@media (max-width:600px){section{padding:64px 0}}
+
+/* ---------- debts / notebook ---------- */
+.debts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:64px;align-items:center}
+.notebook{position:relative;background:#FBFCFF;border-radius:4px 10px 10px 4px;padding:28px 28px 34px 64px;transform:rotate(-1.6deg);box-shadow:0 1px 0 #E6EAF3, 0 18px 40px -22px rgba(19,36,29,.45);
+  background-image:
+    linear-gradient(90deg, transparent 46px, var(--margin-red) 46px, var(--margin-red) 47.5px, transparent 47.5px),
+    linear-gradient(#C9D6EC 1px, transparent 1px),
+    linear-gradient(90deg,#C9D6EC 1px, transparent 1px);
+  background-size:100% 100%, 22px 22px, 22px 22px;
+  min-height:420px}
+.notebook::before{content:"";position:absolute;left:14px;top:22px;bottom:22px;width:12px;background:radial-gradient(circle,#B9C1CF 3.5px,transparent 4px) 0 0/12px 34px repeat-y}
+.notebook h3{font-family:var(--hand);font-weight:700;font-size:2.1rem;color:var(--pen);margin:0 0 6px;line-height:1}
+.notebook ul{list-style:none;margin:0;padding:0;font-family:var(--hand);font-size:1.75rem;line-height:44px;color:var(--pen)}
+.notebook li{display:flex;justify-content:space-between;gap:12px}
+.notebook li.paid{text-decoration:line-through;text-decoration-thickness:2px;opacity:.6}
+.notebook li.fresh{animation:ink .6s ease-out}
+@keyframes ink{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.notebook .scrib{position:absolute;right:24px;top:30px;font-family:var(--hand);font-size:1.45rem;color:var(--margin-red);transform:rotate(-6deg)}
+.debt-points{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:18px}
+.debt-points li{display:grid;grid-template-columns:28px 1fr;gap:14px;align-items:start}
+.debt-points svg{width:28px;height:28px;color:var(--green)}
+.debt-points b{display:block;margin-bottom:2px}
+.debt-points span{color:var(--muted)}
+.app-debts{margin-top:28px;background:var(--white);border-radius:18px;box-shadow:inset 0 0 0 1px var(--line);padding:6px 18px}
+.app-debts .row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #EDF2EF}
+.app-debts .row:last-child{border-bottom:0}
+.app-debts .row small{display:block;color:var(--muted);font-size:.82rem}
+.app-debts .row b{font-variant-numeric:tabular-nums;color:#B3261E}
+@media (max-width:960px){.debts{grid-template-columns:1fr;gap:48px}.notebook{min-height:0}}
+
+/* ---------- modules ---------- */
+.modules{margin-top:48px;border-top:2px solid var(--ink)}
+.mod{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(0,1.4fr) minmax(0,1fr);gap:32px;padding:28px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.mod h3{font-family:var(--display);font-weight:500;font-size:1.4rem;letter-spacing:-.02em;margin:0}
+.mod p{margin:0;max-width:40em}
+.mod ul{margin:0;padding:0;list-style:none;color:var(--muted);font-size:.95rem}
+.mod ul li::before{content:"+ ";color:var(--green);font-weight:600}
+@media (max-width:820px){.mod{grid-template-columns:1fr;gap:10px}}
+
+/* ---------- offline band ---------- */
+.offline{background:var(--green-deep);color:#EAF4EF;position:relative;overflow:hidden}
+.offline::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:var(--cell) var(--cell);pointer-events:none}
+.offline .wrap{position:relative;z-index:1}
+.offline h2{color:var(--white);max-width:20ch}
+.offline .sub{color:#B9D6C8}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;margin-top:56px}
+.fact{border-top:1px solid rgba(255,255,255,.25);padding-top:20px}
+.fact b{display:block;font-size:1.1rem;color:var(--white);margin-bottom:6px}
+.fact span{color:#B9D6C8}
+.wifi{position:absolute;right:-40px;top:40px;width:340px;height:340px;opacity:.12;z-index:0}
+@media (max-width:820px){.facts{grid-template-columns:1fr;gap:24px}.wifi{display:none}}
+
+/* ---------- devices ---------- */
+.devices{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:56px;align-items:center}
+.lang{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+.lang div{background:var(--white);box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;padding:14px 18px;min-width:150px}
+.lang small{display:block;color:var(--muted);font-size:.85rem}
+.lang strong{font-family:var(--display);font-weight:500;font-size:1.15rem}
+.tablet{background:var(--ink);border-radius:28px;padding:12px;box-shadow:0 30px 60px -34px rgba(13,79,57,.6)}
+.tablet .t-screen{background:#F6F8F7;border-radius:18px;display:grid;grid-template-columns:150px 1fr;min-height:300px;overflow:hidden}
+.t-side{background:var(--white);border-right:1px solid #E1EAE5;padding:16px 10px;display:flex;flex-direction:column;gap:4px;font-size:.82rem}
+.t-side span{padding:8px 10px;border-radius:10px;color:var(--muted)}
+.t-side span.on{background:#DDEFE6;color:var(--green-deep);font-weight:600}
+.t-main{padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-content:start}
+.t-tile{background:var(--white);border-radius:14px;padding:14px;box-shadow:inset 0 0 0 1px #E1EAE5}
+.t-tile small{display:block;color:var(--muted);font-size:.75rem}
+.t-tile b{font-size:1.25rem;font-variant-numeric:tabular-nums}
+.t-tile.wide{grid-column:1/-1}
+.bars-chart{display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:10px}
+.bars-chart i{flex:1;background:#BFE0D0;border-radius:4px 4px 0 0}
+.bars-chart i.hi{background:var(--green)}
+@media (max-width:960px){.devices{grid-template-columns:1fr}}
+@media (max-width:520px){.tablet .t-screen{grid-template-columns:1fr}.t-side{display:none}}
+
+/* ---------- faq ---------- */
+.faq{max-width:820px}
+details{border-bottom:1px solid var(--line);padding:4px 0}
+details:first-of-type{border-top:2px solid var(--ink);margin-top:36px}
+summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:24px;padding:20px 0;font-weight:600;font-size:1.1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";flex:none;width:14px;height:14px;margin-top:6px;border-right:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg);transition:transform .2s}
+details[open] summary::after{transform:rotate(-135deg)}
+details p{margin:0 0 22px;color:var(--muted);max-width:40em}
+
+/* ---------- cta ---------- */
+.cta{padding:40px 0 96px}
+.cta-box{background:var(--white);border-radius:28px;box-shadow:inset 0 0 0 1.5px var(--ink);padding:56px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:40px;align-items:center}
+.cta-box h2{margin-bottom:14px}
+.cta-box .actions{display:flex;flex-direction:column;gap:12px}
+.cta-box .actions .btn{width:100%}
+@media (max-width:820px){.cta-box{grid-template-columns:1fr;padding:32px 22px}}
+
+footer{border-top:1px solid var(--line);padding:32px 0 48px;color:var(--muted);font-size:.92rem;background:var(--paper)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
+footer nav{display:flex;flex-wrap:wrap;gap:22px}
+footer a{text-decoration:none}
+footer a:hover{color:var(--ink);text-decoration:underline}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="#">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 4.6 4h14.8L21 9.5"/><path d="M3 9.5c0 1.4 1.1 2.5 2.5 2.5S8 10.9 8 9.5c0 1.4 1.1 2.5 2.5 2.5h3c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5S21 10.9 21 9.5"/><path d="M5 12v8h14v-8"/><path d="M10 20v-4h4v4"/></svg>
+      </span>
+      Мой магазин
+    </a>
+    <nav aria-label="Разделы">
+      <a href="#debts">Долги</a>
+      <a href="#modules">Что умеет</a>
+      <a href="#offline">Без интернета</a>
+      <a href="#faq">Вопросы</a>
+      <a class="btn btn-green" href="#start">Попробовать</a>
+    </nav>
+  </header>
+</div>
+
+<main>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>Касса вашего магазина в обычном телефоне</h1>
+        <p class="lead">Продажи по штрихкоду, приход товара, остатки на складе и долги покупателей. Работает без интернета, на русском и кыргызском языке.</p>
+        <div class="actions">
+          <a class="btn btn-green" href="#start">Попробовать первым</a>
+          <a class="btn btn-ghost" href="#modules">Что умеет приложение</a>
+        </div>
+        <p class="note">Для Android. Сейчас идёт закрытое тестирование в магазинах Кыргызстана.</p>
+        <div class="hand-hint" aria-hidden="true">
+          Нажмите на товары и проведите продажу
+          <svg viewBox="0 0 70 46" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 36c18 4 40 0 58-24"/><path d="M50 10l10 2 0 11"/></svg>
+        </div>
+      </div>
+
+      <div>
+        <div class="phone" role="region" aria-label="Демонстрация кассы">
+          <div class="screen" id="screen">
+            <div class="status">
+              <span>14:32</span>
+              <span class="off" title="Нет сети">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 4.2-2.5M10 5.1A15 15 0 0 1 22 8.8M5 12.6a10 10 0 0 1 3.4-1.9M15.6 10.7A10 10 0 0 1 19 12.6M8.5 16.2a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg>
+                нет сети
+              </span>
+            </div>
+            <div class="appbar">
+              <strong>Касса</strong>
+              <span class="shift">Смена открыта</span>
+            </div>
+            <button class="scan" id="scanBtn" type="button" aria-label="Отсканировать случайный товар">
+              <span class="bars" aria-hidden="true" id="bars"></span>
+              <span class="beam" aria-hidden="true"></span>
+              <span class="label">Наведите камеру на штрихкод</span>
+            </button>
+            <div class="grid-products" id="products"></div>
+            <div class="cart" id="cart" aria-live="polite"></div>
+            <div class="pay">
+              <div class="total"><span>Итого</span><b id="total">0 с</b></div>
+              <div class="pay-methods">
+                <button class="pm main" type="button" data-pay="cash">Наличные</button>
+                <button class="pm" type="button" data-pay="qr">QR</button>
+                <button class="pm" type="button" data-pay="debt">В долг</button>
+              </div>
+            </div>
+
+            <div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-labelledby="sheetTitle"></div>
+
+            <div class="done" id="done" role="status">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m7.5 12.5 3 3 6-6.5"/></svg>
+              <h3>Продажа проведена</h3>
+              <p id="doneText">Остатки на складе обновлены</p>
+              <button class="btn" type="button" id="newSale">Новая продажа</button>
+            </div>
+          </div>
+        </div>
+        <p class="demo-cap">Это демо: всё как в приложении, только товары придуманы. Попробуйте продать в долг.</p>
+      </div>
+    </div>
+  </div>
+
+  <section id="debts">
+    <div class="wrap debts">
+      <div class="notebook" aria-label="Тетрадь долгов">
+        <h3>Карыз дептер</h3>
+        <ul id="notebookList">
+          <li><span>Айгүл эже</span><span>1 240</span></li>
+          <li class="paid"><span>Нурлан</span><span>800</span></li>
+          <li><span>Бакыт байке</span><span>2 315</span></li>
+          <li class="paid"><span>Жылдыз</span><span>450</span></li>
+          <li><span>Темир (сосед)</span><span>370</span></li>
+        </ul>
+        <span class="scrib" aria-hidden="true">а сколько всего??</span>
+      </div>
+
+      <div>
+        <h2>Тетрадь долгов, которая считает сама</h2>
+        <p class="sub">Продажа в долг записывается одной кнопкой на кассе. Сумма сразу попадает на счёт покупателя, и вы всегда видите, кто сколько должен.</p>
+        <ul class="debt-points">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+            <div><b>Что именно взял покупатель</b><span>Каждый долг связан с продажей: видно товары, дату и кассира.</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.4-7"/><path d="M21 4v5h-5"/></svg>
+            <div><b>Частичное погашение</b><span>Покупатель отдал часть суммы? Внесите её, остаток пересчитается.</span></div>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+            <div><b>Напоминание в WhatsApp</b><span>Вежливое сообщение с суммой долга отправляется в один тап.</span></div>
+          </li>
+        </ul>
+        <div class="app-debts" id="appDebts" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="modules">
+    <div class="wrap">
+      <h2>Весь магазин в одном приложении</h2>
+      <p class="sub">Шесть разделов, которые заменяют тетрадь, калькулятор и ручной пересчёт товара.</p>
+
+      <div class="modules">
+        <div class="mod">
+          <h3>Касса</h3>
+          <p>Сканируйте штрихкод камерой телефона или выбирайте товар из списка. Хлеб и развесной товар продаются без штрихкода.</p>
+          <ul><li>наличные, карта, QR, в долг</li><li>смешанная оплата</li><li>возврат по чеку</li></ul>
+        </div>
+        <div class="mod">
+          <h3>Приход</h3>
+          <p>Принимайте товар от поставщика: количество, закупочная цена и наценка. Цена продажи посчитается сама.</p>
+          <ul><li>справочник поставщиков</li><li>долг перед поставщиком</li><li>история приходов</li></ul>
+        </div>
+        <div class="mod">
+          <h3>Склад</h3>
+          <p>Остатки обновляются после каждой продажи и прихода. Приложение подскажет, какой товар заканчивается.</p>
+          <ul><li>инвентаризация</li><li>списание и корректировки</li><li>загрузка товаров из Excel</li></ul>
+        </div>
+        <div class="mod">
+          <h3>Долги</h3>
+          <p>Долги покупателей и ваши долги поставщикам в одном месте, с историей покупок и погашений.</p>
+          <ul><li>поиск по имени и телефону</li><li>напоминания в WhatsApp</li></ul>
+        </div>
+        <div class="mod">
+          <h3>Отчёты</h3>
+          <p>Выручка, прибыль и средний чек за день, неделю или месяц. Сравнение с прошлым периодом и самые продаваемые товары.</p>
+          <ul><li>разбивка по способам оплаты</li><li>топ-10 товаров</li></ul>
+        </div>
+        <div class="mod">
+          <h3>Смены и сотрудники</h3>
+          <p>Кассир входит по своему PIN-коду и видит только то, что вы разрешили. Каждая операция подписана именем сотрудника.</p>
+          <ul><li>открытие и закрытие смены</li><li>внесение и изъятие наличных</li><li>права доступа</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="offline" id="offline">
+    <svg class="wifi" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M2 8.8a15 15 0 0 1 4.2-2.5M10 5.1A15 15 0 0 1 22 8.8M5 12.6a10 10 0 0 1 3.4-1.9M15.6 10.7A10 10 0 0 1 19 12.6M8.5 16.2a5 5 0 0 1 7 0M12 20h.01M3 3l18 18"/></svg>
+    <div class="wrap">
+      <h2>Пропал интернет? Касса продолжает работать</h2>
+      <p class="sub">Все данные хранятся прямо в телефоне. Продажи, приход и отчёты не ждут сети и не зависят от сервера.</p>
+      <div class="facts">
+        <div class="fact"><b>Данные у вас</b><span>Товары, продажи и долги лежат на вашем устройстве. В бесплатной версии они никуда не отправляются.</span></div>
+        <div class="fact"><b>Резервная копия</b><span>Сохраните базу магазина в файл и восстановите её на новом телефоне.</span></div>
+        <div class="fact"><b>Вход один раз</b><span>После первого входа в аккаунт приложение открывается без интернета.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap devices">
+      <div>
+        <h2>На телефоне за прилавком, на планшете на складе</h2>
+        <p class="sub">На планшете разделы раскладываются в две колонки: список слева, подробности справа. Тёмная тема бережёт глаза вечером.</p>
+        <div class="lang">
+          <div><small>Интерфейс</small><strong>Русский</strong></div>
+          <div><small>Интерфейс</small><strong>Кыргызча</strong></div>
+          <div><small>Валюта</small><strong>сом и другие</strong></div>
+        </div>
+      </div>
+      <div class="tablet" aria-hidden="true">
+        <div class="t-screen">
+          <div class="t-side">
+            <span class="on">Сводка</span><span>Сравнение</span><span>Оплата</span><span>Товары</span>
+          </div>
+          <div class="t-main">
+            <div class="t-tile"><small>Выручка за неделю</small><b>184 650 с</b></div>
+            <div class="t-tile"><small>Прибыль</small><b>31 920 с</b></div>
+            <div class="t-tile"><small>Чеков</small><b>612</b></div>
+            <div class="t-tile"><small>Средний чек</small><b>302 с</b></div>
+            <div class="t-tile wide"><small>По дням</small>
+              <div class="bars-chart"><i style="height:55%"></i><i style="height:62%"></i><i style="height:48%"></i><i style="height:70%"></i><i class="hi" style="height:96%"></i><i style="height:82%"></i><i style="height:60%"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap faq">
+      <h2>Частые вопросы</h2>
+      <details>
+        <summary>Нужен ли интернет для работы?</summary>
+        <p>Только для первого входа в аккаунт. Дальше касса, склад, долги и отчёты работают без сети.</p>
+      </details>
+      <details>
+        <summary>Подойдёт ли мой телефон?</summary>
+        <p>Нужен телефон или планшет на Android с камерой. Приложение рассчитано и на недорогие устройства.</p>
+      </details>
+      <details>
+        <summary>Можно ли работать с несколькими продавцами?</summary>
+        <p>Да. Добавьте сотрудников, задайте каждому PIN-код и права. В истории видно, кто провёл продажу или приход.</p>
+      </details>
+      <details>
+        <summary>Как перенести товары, которые уже есть?</summary>
+        <p>Загрузите таблицу Excel или CSV. Приложение покажет, что будет добавлено, и предупредит об ошибках до загрузки.</p>
+      </details>
+      <details>
+        <summary>Печатает ли приложение фискальный чек?</summary>
+        <p>Пока нет. Мы работаем над подключением к ГНС и печатью на термопринтере. Если вы на патенте, фискальный чек не требуется.</p>
+      </details>
+      <details>
+        <summary>Сколько это стоит?</summary>
+        <p>Во время тестирования приложение бесплатно. Цены на версию PRO с облачной синхронизацией объявим перед запуском в Google Play.</p>
+      </details>
+    </div>
+  </section>
+
+  <section class="cta" id="start">
+    <div class="wrap">
+      <div class="cta-box">
+        <div>
+          <h2>Попробуйте в своём магазине</h2>
+          <p class="sub">Мы подключаем магазины к тестированию по одному и помогаем перенести товары. Напишите нам, и мы пришлём ссылку на установку.</p>
+        </div>
+        <div class="actions">
+          <!-- TODO: подставить реальный номер и аккаунт поддержки -->
+          <a class="btn btn-green" href="https://wa.me/" rel="noopener">Написать в WhatsApp</a>
+          <a class="btn btn-ghost" href="https://t.me/" rel="noopener">Написать в Telegram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Naiza Technologies</span>
+    <nav aria-label="Документы">
+      <!-- TODO: страницы документов (нужны для Google Play) -->
+      <a href="#">Политика конфиденциальности</a>
+      <a href="#">Пользовательское соглашение</a>
+      <a href="#">Удаление аккаунта</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const products = [
+    {id:'bread', name:'Хлеб', price:40},
+    {id:'milk', name:'Молоко 1 л', price:95},
+    {id:'sugar', name:'Сахар 1 кг', price:105},
+    {id:'tea', name:'Чай 250 г', price:280},
+    {id:'eggs', name:'Яйца 10 шт', price:150},
+    {id:'oil', name:'Масло 1 л', price:210},
+  ];
+  const customers = ['Айгүл эже', 'Бакыт байке', 'Темир (сосед)', 'Мээрим'];
+  const appDebts = {'Айгүл эже':1240, 'Бакыт байке':2315, 'Темир (сосед)':370};
+  const cart = new Map();
+  const fmt = n => n.toLocaleString('ru-RU').replace(/ /g,' ') + ' с';
+  const $ = id => document.getElementById(id);
+
+  // barcode bars
+  const bars = $('bars');
+  [2,1,3,1,1,2,4,1,2,1,3,2,1,1,3,1,2,4,1,2,1,1,3,2,1].forEach(w => {
+    const i = document.createElement('i'); i.style.width = w + 'px'; bars.appendChild(i);
+  });
+
+  const grid = $('products');
+  products.forEach(p => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'prod';
+    b.innerHTML = `<span>${p.name}</span><b>${fmt(p.price)}</b>`;
+    b.addEventListener('click', () => add(p.id));
+    grid.appendChild(b);
+  });
+
+  function add(id, d = 1){
+    const q = (cart.get(id) || 0) + d;
+    if (q <= 0) cart.delete(id); else cart.set(id, q);
+    render();
+  }
+  const total = () => [...cart].reduce((s,[id,q]) => s + products.find(p=>p.id===id).price*q, 0);
+
+  function render(){
+    const c = $('cart');
+    if (!cart.size){
+      c.innerHTML = '<div class="cart-empty">Корзина пуста. Нажмите на товар или на сканер.</div>';
+    } else {
+      c.innerHTML = '';
+      cart.forEach((q,id) => {
+        const p = products.find(x=>x.id===id);
+        const row = document.createElement('div'); row.className = 'line';
+        row.innerHTML = `<span class="n">${p.name}</span>
+          <button type="button" aria-label="Убрать один: ${p.name}">−</button>
+          <span class="q">${q}</span>
+          <button type="button" aria-label="Добавить ещё: ${p.name}">+</button>
+          <span class="s">${fmt(p.price*q)}</span>`;
+        const [minus, plus] = row.querySelectorAll('button');
+        minus.onclick = () => add(id,-1); plus.onclick = () => add(id,1);
+        c.appendChild(row);
+      });
+    }
+    $('total').textContent = fmt(total());
+    document.querySelectorAll('.pm').forEach(b => b.disabled = !cart.size);
+  }
+
+  // scanner
+  const scan = $('scanBtn');
+  scan.addEventListener('click', () => {
+    scan.classList.remove('go'); void scan.offsetWidth; scan.classList.add('go');
+    setTimeout(() => add(products[Math.floor(Math.random()*products.length)].id), 280);
+  });
+
+  // payment sheets
+  const sheet = $('sheet');
+  const closeSheet = () => sheet.classList.remove('open');
+  function openSheet(html){ sheet.innerHTML = html; sheet.classList.add('open'); sheet.querySelector('button')?.focus(); }
+
+  function qrSvg(){
+    let s = '<svg class="qr" viewBox="0 0 25 25" aria-label="QR-код для оплаты" role="img"><rect width="25" height="25" fill="#fff"/>';
+    const eye = (x,y) => `<rect x="${x}" y="${y}" width="7" height="7" fill="#13241D"/><rect x="${x+1}" y="${y+1}" width="5" height="5" fill="#fff"/><rect x="${x+2}" y="${y+2}" width="3" height="3" fill="#13241D"/>`;
+    let seed = 7;
+    const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
+    for (let y=0;y<25;y++) for (let x=0;x<25;x++){
+      const inEye = (x<8&&y<8)||(x>16&&y<8)||(x<8&&y>16);
+      if (!inEye && rnd()>.52) s += `<rect x="${x}" y="${y}" width="1" height="1" fill="#13241D"/>`;
+    }
+    return s + eye(0,0) + eye(18,0) + eye(0,18) + '</svg>';
+  }
+
+  document.querySelectorAll('.pm').forEach(b => b.addEventListener('click', () => {
+    const t = total(); if (!t) return;
+    const kind = b.dataset.pay;
+    if (kind === 'cash'){
+      const given = [50,100,200,500,1000,2000,5000].find(v => v >= t) || Math.ceil(t/1000)*1000;
+      openSheet(`<h3 id="sheetTitle">Оплата наличными</h3><p>Сдача считается автоматически</p>
+        <div class="cash-row"><span>К оплате</span><b>${fmt(t)}</b></div>
+        <div class="cash-row"><span>Получено</span><b>${fmt(given)}</b></div>
+        <div class="cash-row"><span>Сдача</span><b>${fmt(given-t)}</b></div>
+        <button class="btn btn-green" type="button" data-ok>Провести продажу</button>
+        <button class="btn btn-ghost" type="button" data-cancel>Назад</button>`);
+      bind(() => finish('Сдача: ' + fmt(given-t)));
+    } else if (kind === 'qr'){
+      openSheet(`<h3 id="sheetTitle">Оплата по QR</h3><p>Покупатель сканирует QR вашего магазина</p>
+        ${qrSvg()}<div class="cash-row"><span>Сумма</span><b>${fmt(t)}</b></div>
+        <button class="btn btn-green" type="button" data-ok>Оплата получена</button>
+        <button class="btn btn-ghost" type="button" data-cancel>Назад</button>`);
+      bind(() => finish('Оплата по QR: ' + fmt(t)));
+    } else {
+      openSheet(`<h3 id="sheetTitle">Продажа в долг</h3><p>Кому записать ${fmt(t)}?</p>
+        <div class="chips">${customers.map(c => `<button class="chip" type="button" data-c="${c}">${c}</button>`).join('')}</div>
+        <button class="btn btn-ghost" type="button" data-cancel>Назад</button>`);
+      sheet.querySelectorAll('[data-c]').forEach(ch => ch.onclick = () => {
+        const name = ch.dataset.c;
+        appDebts[name] = (appDebts[name] || 0) + t;
+        writeNotebook(name, t);
+        renderDebts(name);
+        finish(`Долг ${name}: ${fmt(appDebts[name])}`);
+      });
+      sheet.querySelector('[data-cancel]').onclick = closeSheet;
+    }
+  }));
+
+  function bind(ok){
+    sheet.querySelector('[data-ok]').onclick = ok;
+    sheet.querySelector('[data-cancel]').onclick = closeSheet;
+  }
+  function finish(text){
+    closeSheet();
+    $('doneText').textContent = text;
+    $('done').classList.add('open');
+    $('newSale').focus();
+  }
+  $('newSale').addEventListener('click', () => {
+    cart.clear(); render(); $('done').classList.remove('open');
+  });
+
+  function writeNotebook(name, sum){
+    const li = document.createElement('li'); li.className = 'fresh';
+    li.innerHTML = `<span>${name}</span><span>+${sum.toLocaleString('ru-RU').replace(/ /g,' ')}</span>`;
+    const list = $('notebookList');
+    list.appendChild(li);
+    if (list.children.length > 7) list.removeChild(list.firstElementChild);
+  }
+  function renderDebts(highlight){
+    const box = $('appDebts');
+    box.innerHTML = Object.entries(appDebts).sort((a,b)=>b[1]-a[1]).map(([n,s]) =>
+      `<div class="row"><span>${n}<small>${n===highlight ? 'только что, продажа в кассе' : 'последняя покупка на этой неделе'}</small></span><b>${fmt(s)}</b></div>`
+    ).join('') + `<div class="row"><span><strong>Всего должны вам</strong></span><b>${fmt(Object.values(appDebts).reduce((a,b)=>a+b,0))}</b></div>`;
+  }
+
+  // start with two items so the demo isn't empty
+  add('bread', 2); add('milk', 1);
+  renderDebts();
+})();
+</script>
+</body>
+</html>
